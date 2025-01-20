@@ -21,7 +21,7 @@ public final class EPUBPositionsService: PositionsService {
             EPUBPositionsService(
                 readingOrder: context.manifest.readingOrder,
                 presentation: context.manifest.metadata.presentation,
-                pageList: context.manifest.subcollections["pageList"]?.first?.links,
+                pageList: context.manifest.subcollections["pageList"]?.first?.links ?? [],
                 fetcher: context.fetcher,
                 reflowableStrategy: reflowableStrategy
             )
@@ -125,32 +125,36 @@ public final class EPUBPositionsService: PositionsService {
     private func makePositions(ofReflowableResource link: Link, from startPosition: Int) -> (Int, [Locator]) {
         let href = link.href
         var startIndexPosition = startPosition
-
-        var positionRange = pageList
+        let positionRange = pageList
             .filter { $0.href.hasPrefix(href)}
             .compactMap { Int($0.title ?? "")}
-
         let positionCount = pageList.filter { $0.href.hasPrefix(href) }.count
 
         if !positionRange.isEmpty {
             startIndexPosition = positionRange.first!
         }
 
-        let skippedPages = findMissingNumbersUsingXor(positionRange)
+        let skippedPages = findMissingNumbersUsingXor(numbers: positionRange)
 
-        return (0..<positionCount).compactMap { position in
+        let positions = (0..<positionCount).compactMap { position -> Locator? in
             let locatorPosition = startIndexPosition + position
+
             if skippedPages.contains(locatorPosition) {
                 return nil
             }
-            return createLocator(
+
+            return Locator(
                 href: href,
-                type: link.mediaType,
+                type: link.mediaType.type,
                 title: link.title,
-                progression: Double(position - 1) / Double(positionCount),
-                position: locatorPosition
+                locations: .init(
+                    progression: Double(position - 1) / Double(positionCount),
+                    position: locatorPosition
+                )
             )
         }
+
+        return (startPosition, positions)
     }
 
     /**
