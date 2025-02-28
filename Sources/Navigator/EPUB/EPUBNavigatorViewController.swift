@@ -483,6 +483,8 @@ open class EPUBNavigatorViewController: UIViewController,
             return true
         }
         scrollPositionHashMap[currentLocation?.href ?? ""] = currentLocation
+        print("go currentLocation: \(String(describing: currentLocation))")
+        print("go currentLocation?.href: \(String(describing: currentLocation?.href))")
         let isRTL = (viewModel.readingProgression == .rtl)
         let delta = isRTL ? -1 : 1
         let moved: Bool = {
@@ -1192,6 +1194,8 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     func paginationViewDidUpdateViews(_ paginationView: PaginationView) {
         let key = currentLocation?.href ?? ""
         if let locator = scrollPositionHashMap[key] , locator != nil {
+            print("paginationViewDidUpdateViews currentLocation: \(String(describing: currentLocation))")
+            print("paginationViewDidUpdateViews currentLocation?.href: \(String(describing: currentLocation?.href))")
             _ = paginationView.goToIndex(currentSpreadIndex, location: .locator(locator!), completion: {})
         }
 
