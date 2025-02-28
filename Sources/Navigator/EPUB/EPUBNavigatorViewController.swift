@@ -246,7 +246,7 @@ open class EPUBNavigatorViewController: UIViewController,
     private let viewModel: EPUBNavigatorViewModel
     public var publication: Publication { viewModel.publication }
 
-    private var scrollPositionHashMap: [String: Locator?] = [:]
+    private var scrollPositionHashMap: [Int: Locator?] = [:]
 
     var config: Configuration { viewModel.config }
 
@@ -482,19 +482,26 @@ open class EPUBNavigatorViewController: UIViewController,
         {
             return true
         }
-        scrollPositionHashMap[currentLocation?.href ?? ""] = currentLocation
-        print("go currentLocation: \(String(describing: currentLocation))")
-        print("go currentLocation?.href: \(String(describing: currentLocation?.href))")
+        scrollPositionHashMap[currentSpreadIndex] = currentLocation
         let isRTL = (viewModel.readingProgression == .rtl)
         let delta = isRTL ? -1 : 1
         let moved: Bool = {
             switch direction {
             case .left:
-                let location: PageLocation = isRTL ? .start : .end
-                return paginationView.goToIndex(currentSpreadIndex - delta, location: location, animated: animated, completion: completion)
+                let location: PageLocation = .start
+                if let locator = scrollPositionHashMap[currentSpreadIndex - delta], locator != nil {
+                    return paginationView.goToIndex(currentSpreadIndex - delta, location: .locator(locator!), animated: animated, completion: completion)
+                } else {
+                    return paginationView.goToIndex(currentSpreadIndex - delta, location: location, animated: animated, completion: completion)
+                }
             case .right:
-                let location: PageLocation = isRTL ? .end : .start
-                return paginationView.goToIndex(currentSpreadIndex + delta, location: location, animated: animated, completion: completion)
+                let location: PageLocation = .start
+                if let locator = scrollPositionHashMap[currentSpreadIndex + delta], locator != nil {
+                    return paginationView.goToIndex(currentSpreadIndex + delta, location: .locator(locator!), animated: animated, completion: completion)
+                } else {
+                    return paginationView.goToIndex(currentSpreadIndex + delta, location: location, animated: animated, completion: completion)
+                }
+
             }
         }()
 
@@ -743,7 +750,7 @@ open class EPUBNavigatorViewController: UIViewController,
     }
 
     public func go(to locator: Locator, animated: Bool, completion: @escaping () -> Void) -> Bool {
-        scrollPositionHashMap[locator.href] = nil
+        scrollPositionHashMap[currentSpreadIndex] = nil
         guard
             let spreadIndex = spreads.firstIndex(withHref: locator.href),
             on(.jump(locator))
@@ -1192,13 +1199,6 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     }
 
     func paginationViewDidUpdateViews(_ paginationView: PaginationView) {
-        let key = currentLocation?.href ?? ""
-        if let locator = scrollPositionHashMap[key] , locator != nil {
-            print("paginationViewDidUpdateViews currentLocation: \(String(describing: currentLocation))")
-            print("paginationViewDidUpdateViews currentLocation?.href: \(String(describing: currentLocation?.href))")
-            _ = paginationView.goToIndex(currentSpreadIndex, location: .locator(locator!), completion: {})
-        }
-
         // notice that you should set the delegate before you load views
         // otherwise, when open the publication, you may miss the first invocation
         notifyCurrentLocation()
