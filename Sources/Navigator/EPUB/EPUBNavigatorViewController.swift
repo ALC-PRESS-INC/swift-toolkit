@@ -246,7 +246,7 @@ open class EPUBNavigatorViewController: UIViewController,
     private let viewModel: EPUBNavigatorViewModel
     public var publication: Publication { viewModel.publication }
 
-    private let scrollPositionHashMap: [String: Locator?] = [:]
+    private var scrollPositionHashMap: [String: Locator?] = [:]
 
     var config: Configuration { viewModel.config }
 
@@ -482,7 +482,7 @@ open class EPUBNavigatorViewController: UIViewController,
         {
             return true
         }
-        scrollPositionHashMap[locator.href.string] = currentLocation
+        scrollPositionHashMap[currentLocation?.href ?? ""] = currentLocation
         let isRTL = (viewModel.readingProgression == .rtl)
         let delta = isRTL ? -1 : 1
         let moved: Bool = {
@@ -741,8 +741,7 @@ open class EPUBNavigatorViewController: UIViewController,
     }
 
     public func go(to locator: Locator, animated: Bool, completion: @escaping () -> Void) -> Bool {
-        let locator = publication.normalizeLocator(locator)
-        scrollPositionHashMap[locator.href.string] = nil
+        scrollPositionHashMap[locator.href] = nil
         guard
             let spreadIndex = spreads.firstIndex(withHref: locator.href),
             on(.jump(locator))
@@ -1191,9 +1190,11 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     }
 
     func paginationViewDidUpdateViews(_ paginationView: PaginationView) {
-        let key = currentLocation?.href.string ?? ""
-        let locator = scrollPositionHashMap[key]
-        paginationView.goToIndex(currentSpreadIndex, location: .locator(locator))
+        let key = currentLocation?.href ?? ""
+        if let locator = scrollPositionHashMap[key] , locator != nil {
+            _ = paginationView.goToIndex(currentSpreadIndex, location: .locator(locator!), completion: {})
+        }
+
         // notice that you should set the delegate before you load views
         // otherwise, when open the publication, you may miss the first invocation
         notifyCurrentLocation()
