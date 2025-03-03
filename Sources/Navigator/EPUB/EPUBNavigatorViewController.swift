@@ -483,6 +483,9 @@ open class EPUBNavigatorViewController: UIViewController,
             return true
         }
         scrollPositionHashMap[currentSpreadIndex] = currentLocation
+
+        EPUBLogger.log(with: "scrollPositionHashMap: \(scrollPositionHashMap)")
+
         let isRTL = (viewModel.readingProgression == .rtl)
         let delta = isRTL ? -1 : 1
         let moved: Bool = {
