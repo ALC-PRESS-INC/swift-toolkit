@@ -342,6 +342,8 @@ open class EPUBNavigatorViewController: UIViewController,
     override open func viewDidLoad() {
         super.viewDidLoad()
 
+        EPUBLogger.log(with: "viewDidLoad Readium")
+
         // Will call `accessibilityScroll()` when VoiceOver reaches the end of
         // the current resource. We can use this to go to the next resource.
         view.accessibilityTraits.insert(.causesPageTurn)

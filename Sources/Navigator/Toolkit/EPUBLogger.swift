@@ -16,7 +16,7 @@ public struct EPUBLogger {
 
     public static func log(with object: Any) {
         os_log(
-            "Readium-iOS: %{public}@",
+            "Value: %{public}@",
             log: log,
             type: .debug,
             String(describing: object)
