@@ -484,7 +484,7 @@ open class EPUBNavigatorViewController: UIViewController,
         }
         scrollPositionHashMap[currentSpreadIndex] = currentLocation
 
-        EPUBLogger.log(with: "scrollPositionHashMap: \(scrollPositionHashMap)")
+        EPUBLogger.log(with: "go(to direction: \(scrollPositionHashMap)")
 
         let isRTL = (viewModel.readingProgression == .rtl)
         let delta = isRTL ? -1 : 1
@@ -761,6 +761,8 @@ open class EPUBNavigatorViewController: UIViewController,
             return false
         }
 
+        EPUBLogger.log(with: "go(to locator: Locator: \(scrollPositionHashMap)")
+
         return paginationView.goToIndex(spreadIndex, location: .locator(locator), animated: animated) {
             self.on(.jumped)
             self.delegate?.navigator(self, didJumpTo: locator)
@@ -772,6 +774,7 @@ open class EPUBNavigatorViewController: UIViewController,
         guard let locator = publication.locate(link) else {
             return false
         }
+        EPUBLogger.log(with: "go(to link: Link \(scrollPositionHashMap)")
         return go(to: locator, animated: animated, completion: completion)
     }
 
@@ -796,6 +799,7 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .right
             }
         }()
+        EPUBLogger.log(with: "goBackward(animated: Bool \(scrollPositionHashMap)")
         return go(to: direction, animated: animated, completion: completion)
     }
 
