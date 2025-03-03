@@ -172,6 +172,8 @@ final class PaginationView: UIView, Loggable {
         loadedViews.removeAll()
         loadingIndexQueue.removeAll()
 
+
+        NSLog("THIS IS FROM READIUM PaginationView->reloadAtIndex")
         setCurrentIndex(index, location: location, completion: completion)
     }
 
@@ -205,6 +207,7 @@ final class PaginationView: UIView, Loggable {
             }
         }
 
+        NSLog("THIS IS FROM READIUM PaginationView->setCurrentIndex")
         loadNextPage { [weak self] in
             if let self = self {
                 self.delegate?.paginationViewDidUpdateViews(self)
@@ -233,6 +236,8 @@ final class PaginationView: UIView, Loggable {
             return
         }
 
+        NSLog("THIS IS FROM READIUM PaginationView->loadNextPage")
+
         view.go(to: location) {
             self.loadNextPage(completion: completion)
         }
@@ -254,6 +259,7 @@ final class PaginationView: UIView, Loggable {
         else {
             return sourceIndex
         }
+        NSLog("THIS IS FROM READIUM PaginationView->scheduleLoadPages")
 
         return scheduleLoadPages(
             from: index,
@@ -272,6 +278,7 @@ final class PaginationView: UIView, Loggable {
             return false
         }
 
+        NSLog("THIS IS FROM READIUM PaginationView->scheduleLoadPage")
         loadingIndexQueue.removeAll { $0.index == index }
         loadingIndexQueue.append((index: index, location: location))
         return true
@@ -300,6 +307,7 @@ final class PaginationView: UIView, Loggable {
         } else {
             fadeToView(at: index, location: location, animated: animated, completion: completion)
         }
+        NSLog("THIS IS FROM READIUM PaginationView->goToIndex")
         return true
     }
 
@@ -314,6 +322,7 @@ final class PaginationView: UIView, Loggable {
                 completion()
             }
         }
+        NSLog("THIS IS FROM READIUM PaginationView->fadeToView")
 
         fade(to: 0) {
             self.scrollToView(at: index, location: location) {
@@ -331,6 +340,7 @@ final class PaginationView: UIView, Loggable {
             }
             return
         }
+        NSLog("THIS IS FROM READIUM PaginationView->scrollToView")
 
         scrollView.isScrollEnabled = true
         setCurrentIndex(index, location: location, completion: completion)
