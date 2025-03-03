@@ -385,6 +385,8 @@ extension PaginationView: UIScrollViewDelegate {
 
         let newIndex = Int(round(currentOffset / scrollView.frame.width))
 
+        NSLog("THIS IS FROM READIUM PaginationView->scrollViewDidEndDecelerating")
+
         setCurrentIndex(newIndex)
     }
 }

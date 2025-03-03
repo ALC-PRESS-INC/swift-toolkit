@@ -469,6 +469,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
     /// Goes to the next or previous page in the given scroll direction.
     private func go(to direction: EPUBSpreadView.Direction, animated: Bool, completion completionBlock: @escaping () -> Void) -> Bool {
+        NSLog("THIS IS FROM READIUM go(to direction: %@", String(describing: scrollPositionHashMap))
         guard on(.move(direction)) else {
             return false
         }
@@ -485,8 +486,6 @@ open class EPUBNavigatorViewController: UIViewController,
             return true
         }
         scrollPositionHashMap[currentSpreadIndex] = currentLocation
-
-        NSLog("THIS IS FROM READIUM go(to direction: %@", String(describing: scrollPositionHashMap))
 
         let isRTL = (viewModel.readingProgression == .rtl)
         let delta = isRTL ? -1 : 1
@@ -1203,6 +1202,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
             animatedLoad: false
         )
         spreadView.delegate = self
+        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->pageViewAtIndex")
 
         let userContentController = spreadView.webView.configuration.userContentController
         delegate?.navigator(self, setupUserScripts: userContentController)
@@ -1214,6 +1214,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
         // notice that you should set the delegate before you load views
         // otherwise, when open the publication, you may miss the first invocation
         notifyCurrentLocation()
+        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->paginationViewDidUpdateViews")
 
         // FIXME: Deprecated, to be removed at some point.
         if let currentResourceIndex = currentResourceIndex {
@@ -1222,6 +1223,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     }
 
     func paginationView(_ paginationView: PaginationView, positionCountAtIndex index: Int) -> Int {
-        spreads[index].positionCount(in: readingOrder, positionsByReadingOrder: positionsByReadingOrder)
+        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->positionCountAtIndex")
+        return spreads[index].positionCount(in: readingOrder, positionsByReadingOrder: positionsByReadingOrder)
     }
 }
