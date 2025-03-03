@@ -490,6 +490,8 @@ open class EPUBNavigatorViewController: UIViewController,
         }
         scrollPositionHashMap[currentSpreadIndex] = currentLocation
 
+        NSLog("THIS IS FROM READIUM OUTSIDE: %@", String(describing: scrollPositionHashMap))
+
         if #available(iOS 14.0, *) {
             EPUBLogger.log(with: "go(to direction: \(scrollPositionHashMap)")
         } else {

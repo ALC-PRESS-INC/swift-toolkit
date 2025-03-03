@@ -31,7 +31,8 @@ public struct EPUBLogger {
 
     @available(iOS 14.0, *)
     public static func log(with object: Any) {
-        logger.debug("THIS IS FROM READIUM: \(String(describing: object), privacy: .public)")
+        //logger.debug("THIS IS FROM READIUM: \(String(describing: object), privacy: .public)")
+        NSLog("THIS IS FROM READIUM: %@", String(describing: object))
     }
 
 }
