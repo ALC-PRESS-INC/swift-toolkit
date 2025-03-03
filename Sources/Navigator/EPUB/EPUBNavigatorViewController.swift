@@ -342,11 +342,7 @@ open class EPUBNavigatorViewController: UIViewController,
     override open func viewDidLoad() {
         super.viewDidLoad()
 
-        if #available(iOS 14.0, *) {
-            EPUBLogger.log(with: "viewDidLoad Readium")
-        } else {
-            // Fallback on earlier versions
-        }
+        NSLog("THIS IS FROM READIUM viewDidLoad Readium")
 
         // Will call `accessibilityScroll()` when VoiceOver reaches the end of
         // the current resource. We can use this to go to the next resource.
@@ -490,13 +486,7 @@ open class EPUBNavigatorViewController: UIViewController,
         }
         scrollPositionHashMap[currentSpreadIndex] = currentLocation
 
-        NSLog("THIS IS FROM READIUM OUTSIDE: %@", String(describing: scrollPositionHashMap))
-
-        if #available(iOS 14.0, *) {
-            EPUBLogger.log(with: "go(to direction: \(scrollPositionHashMap)")
-        } else {
-            // Fallback on earlier versions
-        }
+        NSLog("THIS IS FROM READIUM go(to direction: %@", String(describing: scrollPositionHashMap))
 
         let isRTL = (viewModel.readingProgression == .rtl)
         let delta = isRTL ? -1 : 1
@@ -773,11 +763,7 @@ open class EPUBNavigatorViewController: UIViewController,
             return false
         }
 
-        if #available(iOS 14.0, *) {
-            EPUBLogger.log(with: "go(to locator: Locator: \(scrollPositionHashMap)")
-        } else {
-            // Fallback on earlier versions
-        }
+        NSLog("THIS IS FROM READIUM go(to locator: Locator: %@", String(describing: scrollPositionHashMap))
 
         return paginationView.goToIndex(spreadIndex, location: .locator(locator), animated: animated) {
             self.on(.jumped)
@@ -790,11 +776,8 @@ open class EPUBNavigatorViewController: UIViewController,
         guard let locator = publication.locate(link) else {
             return false
         }
-        if #available(iOS 14.0, *) {
-            EPUBLogger.log(with: "go(to link: Link \(scrollPositionHashMap)")
-        } else {
-            // Fallback on earlier versions
-        }
+
+        NSLog("THIS IS FROM READIUM go(to link Link: %@", String(describing: scrollPositionHashMap))
         return go(to: locator, animated: animated, completion: completion)
     }
 
@@ -807,6 +790,7 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .left
             }
         }()
+        NSLog("THIS IS FROM READIUM goForward(animated Bool: %@", String(describing: scrollPositionHashMap))
         return go(to: direction, animated: animated, completion: completion)
     }
 
@@ -819,11 +803,8 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .right
             }
         }()
-        if #available(iOS 14.0, *) {
-            EPUBLogger.log(with: "goBackward(animated: Bool \(scrollPositionHashMap)")
-        } else {
-            // Fallback on earlier versions
-        }
+
+        NSLog("THIS IS FROM READIUM goBackward(animated Bool %@", String(describing: scrollPositionHashMap))
         return go(to: direction, animated: animated, completion: completion)
     }
 
