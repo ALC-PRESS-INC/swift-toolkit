@@ -342,7 +342,11 @@ open class EPUBNavigatorViewController: UIViewController,
     override open func viewDidLoad() {
         super.viewDidLoad()
 
-        EPUBLogger.log(with: "viewDidLoad Readium")
+        if #available(iOS 14.0, *) {
+            EPUBLogger.log(with: "viewDidLoad Readium")
+        } else {
+            // Fallback on earlier versions
+        }
 
         // Will call `accessibilityScroll()` when VoiceOver reaches the end of
         // the current resource. We can use this to go to the next resource.
@@ -486,7 +490,11 @@ open class EPUBNavigatorViewController: UIViewController,
         }
         scrollPositionHashMap[currentSpreadIndex] = currentLocation
 
-        EPUBLogger.log(with: "go(to direction: \(scrollPositionHashMap)")
+        if #available(iOS 14.0, *) {
+            EPUBLogger.log(with: "go(to direction: \(scrollPositionHashMap)")
+        } else {
+            // Fallback on earlier versions
+        }
 
         let isRTL = (viewModel.readingProgression == .rtl)
         let delta = isRTL ? -1 : 1
@@ -763,7 +771,11 @@ open class EPUBNavigatorViewController: UIViewController,
             return false
         }
 
-        EPUBLogger.log(with: "go(to locator: Locator: \(scrollPositionHashMap)")
+        if #available(iOS 14.0, *) {
+            EPUBLogger.log(with: "go(to locator: Locator: \(scrollPositionHashMap)")
+        } else {
+            // Fallback on earlier versions
+        }
 
         return paginationView.goToIndex(spreadIndex, location: .locator(locator), animated: animated) {
             self.on(.jumped)
@@ -776,7 +788,11 @@ open class EPUBNavigatorViewController: UIViewController,
         guard let locator = publication.locate(link) else {
             return false
         }
-        EPUBLogger.log(with: "go(to link: Link \(scrollPositionHashMap)")
+        if #available(iOS 14.0, *) {
+            EPUBLogger.log(with: "go(to link: Link \(scrollPositionHashMap)")
+        } else {
+            // Fallback on earlier versions
+        }
         return go(to: locator, animated: animated, completion: completion)
     }
 
@@ -801,7 +817,11 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .right
             }
         }()
-        EPUBLogger.log(with: "goBackward(animated: Bool \(scrollPositionHashMap)")
+        if #available(iOS 14.0, *) {
+            EPUBLogger.log(with: "goBackward(animated: Bool \(scrollPositionHashMap)")
+        } else {
+            // Fallback on earlier versions
+        }
         return go(to: direction, animated: animated, completion: completion)
     }
 
