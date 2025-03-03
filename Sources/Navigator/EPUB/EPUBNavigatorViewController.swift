@@ -438,6 +438,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
     @discardableResult
     private func on(_ event: Event) -> Bool {
+        NSLog("THIS IS FROM READIUM PaginationView->on %@", String(describing: event))
         assert(Thread.isMainThread, "Raising navigation events must be done from the main thread")
 
         if config.debugState {
@@ -740,6 +741,7 @@ open class EPUBNavigatorViewController: UIViewController,
         when: { [weak self] in self?.state == .idle },
         pollingInterval: 0.1
     ) { [weak self] in
+        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation %@", String(describing: self?.currentLocation))
         guard
             let self = self,
             let delegate = self.delegate,
@@ -1223,7 +1225,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     }
 
     func paginationView(_ paginationView: PaginationView, positionCountAtIndex index: Int) -> Int {
-        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->positionCountAtIndex")
+        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->positionCountAtIndex: %@", String(describing: index))
         return spreads[index].positionCount(in: readingOrder, positionsByReadingOrder: positionsByReadingOrder)
     }
 }
