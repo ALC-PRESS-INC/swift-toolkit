@@ -1215,8 +1215,8 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     func paginationViewDidUpdateViews(_ paginationView: PaginationView) {
         // notice that you should set the delegate before you load views
         // otherwise, when open the publication, you may miss the first invocation
-        notifyCurrentLocation()
         NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->paginationViewDidUpdateViews")
+        notifyCurrentLocation()
 
         // FIXME: Deprecated, to be removed at some point.
         if let currentResourceIndex = currentResourceIndex {
