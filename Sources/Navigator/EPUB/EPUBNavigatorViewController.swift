@@ -651,9 +651,17 @@ open class EPUBNavigatorViewController: UIViewController,
             }
         }()
 
+        var cacheLocator: PageLocation!
+
+        if let _ = self.scrollPositionHashMap[initialIndex] {
+            cacheLocator = PageLocation(self.scrollPositionHashMap[initialIndex]!)
+        } else {
+            cacheLocator = PageLocation(locator)
+        }
+
         paginationView.reloadAtIndex(
             initialIndex,
-            location: PageLocation(locator),
+            location: cacheLocator,
             pageCount: spreads.count,
             readingProgression: viewModel.readingProgression
         ) {
@@ -742,6 +750,12 @@ open class EPUBNavigatorViewController: UIViewController,
         pollingInterval: 0.1
     ) { [weak self] in
         NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation %@", String(describing: self?.currentLocation))
+
+        if let csi = self?.currentSpreadIndex, let currLoc = self?.currentLocation {
+            self?.scrollPositionHashMap[csi] = currLoc
+            NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation->scrollPositionHashMap  %@", String(describing: self?.scrollPositionHashMap))
+        }
+
         guard
             let self = self,
             let delegate = self.delegate,
@@ -756,6 +770,7 @@ open class EPUBNavigatorViewController: UIViewController,
     }
 
     public func go(to locator: Locator, animated: Bool, completion: @escaping () -> Void) -> Bool {
+        NSLog("THIS IS FROM READIUM go(to locator: Locator: %@", String(describing: scrollPositionHashMap))
         scrollPositionHashMap[currentSpreadIndex] = nil
         guard
             let spreadIndex = spreads.firstIndex(withHref: locator.href),
@@ -763,8 +778,6 @@ open class EPUBNavigatorViewController: UIViewController,
         else {
             return false
         }
-
-        NSLog("THIS IS FROM READIUM go(to locator: Locator: %@", String(describing: scrollPositionHashMap))
 
         return paginationView.goToIndex(spreadIndex, location: .locator(locator), animated: animated) {
             self.on(.jumped)
