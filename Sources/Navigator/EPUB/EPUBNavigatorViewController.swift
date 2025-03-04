@@ -486,7 +486,7 @@ open class EPUBNavigatorViewController: UIViewController,
         {
             return true
         }
-        scrollPositionHashMap[currentSpreadIndex] = currentLocation
+        //scrollPositionHashMap[currentSpreadIndex] = currentLocation
 
         let isRTL = (viewModel.readingProgression == .rtl)
         let delta = isRTL ? -1 : 1
@@ -749,11 +749,18 @@ open class EPUBNavigatorViewController: UIViewController,
         when: { [weak self] in self?.state == .idle },
         pollingInterval: 0.1
     ) { [weak self] in
-        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation %@", String(describing: self?.currentLocation))
+        /*NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation %@", String(describing: self?.currentLocation))
 
         if let csi = self?.currentSpreadIndex, let currLoc = self?.currentLocation {
             self?.scrollPositionHashMap[csi] = currLoc
             NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation->scrollPositionHashMap  %@", String(describing: self?.scrollPositionHashMap))
+        }*/
+
+        if let cachedPosition = self?.currentLocation?.locations.position,
+           let cachedLocation = self?.scrollPositionHashMap[cachedPosition],
+           cachedLocation != nil {
+
+            NSLog("HIS IS FROM READIUM IT HAS A CACHED %@", String(describing: cachedLocation!))
         }
 
         guard
@@ -764,6 +771,9 @@ open class EPUBNavigatorViewController: UIViewController,
         else {
             return
         }
+
+        let index = location.locations.position ?? 1
+        self.scrollPositionHashMap[index] = location
 
         self.notifiedCurrentLocation = location
         delegate.navigator(self, locationDidChange: location)
