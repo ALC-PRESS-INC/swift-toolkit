@@ -751,15 +751,9 @@ open class EPUBNavigatorViewController: UIViewController,
     ) { [weak self] in
         NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation %@", String(describing: self?.currentLocation))
 
-        /*if let csi = self?.currentSpreadIndex, let currLoc = self?.currentLocation {
-            self?.scrollPositionHashMap[csi] = currLoc
-            NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation->scrollPositionHashMap  %@", String(describing: self?.scrollPositionHashMap))
-        }*/
-
         if let cachedPosition = self?.currentLocation?.locations.position,
            let cachedLocation = self?.scrollPositionHashMap[cachedPosition],
            cachedLocation != nil {
-            
 
             NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->SAVED IN CACHED   %@", String(describing: cachedLocation!))
 
@@ -776,6 +770,8 @@ open class EPUBNavigatorViewController: UIViewController,
 
             self.notifiedCurrentLocation = cachedLocation
             delegate.navigator(self, locationDidChange: cachedLocation!)
+
+            self.go(to: cachedLocation!)
         } else {
             guard
                 let self = self,
