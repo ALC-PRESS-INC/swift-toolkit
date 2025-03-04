@@ -438,7 +438,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
     @discardableResult
     private func on(_ event: Event) -> Bool {
-        NSLog("THIS IS FROM READIUM PaginationView->on %@", String(describing: event))
+        NSLog("THIS IS FROM READIUM EPUBNavigationViewController->on %@", String(describing: event))
         assert(Thread.isMainThread, "Raising navigation events must be done from the main thread")
 
         if config.debugState {
@@ -744,6 +744,8 @@ open class EPUBNavigatorViewController: UIViewController,
     /// Used to avoid sending twice the same location.
     private var notifiedCurrentLocation: Locator?
 
+    private var isCachedApplied: Bool = false
+
     private lazy var notifyCurrentLocation = execute(
         // If we're not in an `idle` state, we postpone the notification.
         when: { [weak self] in self?.state == .idle },
@@ -753,7 +755,8 @@ open class EPUBNavigatorViewController: UIViewController,
 
         if let cachedPosition = self?.currentLocation?.locations.position,
            let cachedLocation = self?.scrollPositionHashMap[cachedPosition],
-           cachedLocation != nil {
+           cachedLocation != nil,
+           (!(self?.isCachedApplied ?? true)) {
 
             NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->SAVED IN CACHED   %@", String(describing: cachedLocation!))
 
@@ -764,6 +767,8 @@ open class EPUBNavigatorViewController: UIViewController,
             else {
                 return
             }
+
+            self.isCachedApplied = true
 
             let index = location.locations.position ?? 1
             self.scrollPositionHashMap[index] = location
@@ -781,6 +786,8 @@ open class EPUBNavigatorViewController: UIViewController,
             else {
                 return
             }
+
+            self.isCachedApplied = false
 
             let index = location.locations.position ?? 1
             self.scrollPositionHashMap[index] = location
