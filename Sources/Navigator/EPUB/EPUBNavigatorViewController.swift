@@ -342,7 +342,7 @@ open class EPUBNavigatorViewController: UIViewController,
     override open func viewDidLoad() {
         super.viewDidLoad()
 
-        //NSLog("THIS IS FROM READIUM viewDidLoad Readium")
+        EPUBLogger.log(with: "viewDidLoad")
 
         // Will call `accessibilityScroll()` when VoiceOver reaches the end of
         // the current resource. We can use this to go to the next resource.
@@ -438,7 +438,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
     @discardableResult
     private func on(_ event: Event) -> Bool {
-        //NSLog("THIS IS FROM READIUM EPUBNavigationViewController->on %@", String(describing: event))
+        EPUBLogger.log(with: event)
         assert(Thread.isMainThread, "Raising navigation events must be done from the main thread")
 
         if config.debugState {
@@ -470,7 +470,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
     /// Goes to the next or previous page in the given scroll direction.
     private func go(to direction: EPUBSpreadView.Direction, animated: Bool, completion completionBlock: @escaping () -> Void) -> Bool {
-        //NSLog("THIS IS FROM READIUM go(to direction: %@", String(describing: scrollPositionHashMap))
+        EPUBLogger.log(with: "go(to direction: \(scrollPositionHashMap)")
         guard on(.move(direction)) else {
             return false
         }
@@ -751,6 +751,7 @@ open class EPUBNavigatorViewController: UIViewController,
         when: { [weak self] in self?.state == .idle },
         pollingInterval: 0.1
     ) { [weak self] in
+        EPUBLogger.log(with: "notifyCurrentLocation \(self?.currentLocation)")
         //NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation %@", String(describing: self?.currentLocation))
 
 //        if let cachedPosition = self?.currentLocation?.locations.position,
@@ -815,7 +816,7 @@ open class EPUBNavigatorViewController: UIViewController,
     }
 
     public func go(to locator: Locator, animated: Bool, completion: @escaping () -> Void) -> Bool {
-        //NSLog("THIS IS FROM READIUM go(to locator: Locator: %@", String(describing: scrollPositionHashMap))
+        EPUBLogger.log(with: "go(to locator:")
         scrollPositionHashMap[currentSpreadIndex] = nil
         guard
             let spreadIndex = spreads.firstIndex(withHref: locator.href),
@@ -832,15 +833,15 @@ open class EPUBNavigatorViewController: UIViewController,
     }
 
     public func go(to link: Link, animated: Bool, completion: @escaping () -> Void) -> Bool {
+        EPUBLogger.log(with: "go(to link: Link")
         guard let locator = publication.locate(link) else {
             return false
         }
-
-        //NSLog("THIS IS FROM READIUM go(to link Link: %@", String(describing: scrollPositionHashMap))
         return go(to: locator, animated: animated, completion: completion)
     }
 
     public func goForward(animated: Bool, completion: @escaping () -> Void) -> Bool {
+        EPUBLogger.log(with: "goForward(animated: Bool \(viewModel.readingProgression)")
         let direction: EPUBSpreadView.Direction = {
             switch viewModel.readingProgression {
             case .ltr:
@@ -849,11 +850,11 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .left
             }
         }()
-        //NSLog("THIS IS FROM READIUM goForward(animated Bool: %@", String(describing: scrollPositionHashMap))
         return go(to: direction, animated: animated, completion: completion)
     }
 
     public func goBackward(animated: Bool, completion: @escaping () -> Void) -> Bool {
+        EPUBLogger.log(with: "goBackward(animated: Bool \(viewModel.readingProgression)")
         let direction: EPUBSpreadView.Direction = {
             switch viewModel.readingProgression {
             case .ltr:
@@ -862,8 +863,6 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .right
             }
         }()
-
-        //NSLog("THIS IS FROM READIUM goBackward(animated Bool %@", String(describing: scrollPositionHashMap))
         return go(to: direction, animated: animated, completion: completion)
     }
 
@@ -1253,6 +1252,8 @@ extension EPUBNavigatorViewController: EditingActionsControllerDelegate {
 
 extension EPUBNavigatorViewController: PaginationViewDelegate {
     func paginationView(_ paginationView: PaginationView, pageViewAtIndex index: Int) -> (UIView & PageView)? {
+        EPUBLogger.log(with: "paginationView(_ paginationView:")
+
         let spread = spreads[index]
         let spreadViewType = (spread.layout == .fixed) ? EPUBFixedSpreadView.self : EPUBReflowableSpreadView.self
         let spreadView = spreadViewType.init(
@@ -1262,7 +1263,6 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
             animatedLoad: false
         )
         spreadView.delegate = self
-        //NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->pageViewAtIndex")
 
         let userContentController = spreadView.webView.configuration.userContentController
         delegate?.navigator(self, setupUserScripts: userContentController)
@@ -1273,7 +1273,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     func paginationViewDidUpdateViews(_ paginationView: PaginationView) {
         // notice that you should set the delegate before you load views
         // otherwise, when open the publication, you may miss the first invocation
-        //NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->paginationViewDidUpdateViews")
+        EPUBLogger.log(with: "paginationViewDidUpdateViews")
         notifyCurrentLocation()
 
         // FIXME: Deprecated, to be removed at some point.
@@ -1284,6 +1284,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
 
     func paginationView(_ paginationView: PaginationView, positionCountAtIndex index: Int) -> Int {
         //NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->positionCountAtIndex: %@", String(describing: index))
+        EPUBLogger.log(with: "paginationViewDidUpdateViews \(String(describing: index))")
         return spreads[index].positionCount(in: readingOrder, positionsByReadingOrder: positionsByReadingOrder)
     }
 }
