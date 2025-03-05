@@ -1291,6 +1291,25 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
         // notice that you should set the delegate before you load views
         // otherwise, when open the publication, you may miss the first invocation
         EPUBLogger.log(with: "EPUBNavigatorViewController paginationViewDidUpdateViews")
+
+        EPUBLogger.log(
+            with:
+                """
+                    initialLocation: \(initialLocation)
+
+                    readingOrder: \(readingOrder)
+
+                    positionsByReadingOrder: \(positionsByReadingOrder)
+
+                    viewModel: \(viewModel)
+
+                    publication: \(publication)
+
+                    scrollPositionHashMap: \(scrollPositionHashMap)
+                """
+        )
+
+
         notifyCurrentLocation()
 
         // FIXME: Deprecated, to be removed at some point.
@@ -1301,7 +1320,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
 
     func paginationView(_ paginationView: PaginationView, positionCountAtIndex index: Int) -> Int {
         //NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->positionCountAtIndex: %@", String(describing: index))
-        EPUBLogger.log(with: "EPUBNavigatorViewController paginationViewDidUpdateViews \(String(describing: index))")
+        EPUBLogger.log(with: "EPUBNavigatorViewController positionCountAtIndex \(String(describing: index))")
         return spreads[index].positionCount(in: readingOrder, positionsByReadingOrder: positionsByReadingOrder)
     }
 }
