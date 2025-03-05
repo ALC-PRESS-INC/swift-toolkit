@@ -342,7 +342,7 @@ open class EPUBNavigatorViewController: UIViewController,
     override open func viewDidLoad() {
         super.viewDidLoad()
 
-        NSLog("THIS IS FROM READIUM viewDidLoad Readium")
+        //NSLog("THIS IS FROM READIUM viewDidLoad Readium")
 
         // Will call `accessibilityScroll()` when VoiceOver reaches the end of
         // the current resource. We can use this to go to the next resource.
@@ -438,7 +438,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
     @discardableResult
     private func on(_ event: Event) -> Bool {
-        NSLog("THIS IS FROM READIUM EPUBNavigationViewController->on %@", String(describing: event))
+        //NSLog("THIS IS FROM READIUM EPUBNavigationViewController->on %@", String(describing: event))
         assert(Thread.isMainThread, "Raising navigation events must be done from the main thread")
 
         if config.debugState {
@@ -470,7 +470,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
     /// Goes to the next or previous page in the given scroll direction.
     private func go(to direction: EPUBSpreadView.Direction, animated: Bool, completion completionBlock: @escaping () -> Void) -> Bool {
-        NSLog("THIS IS FROM READIUM go(to direction: %@", String(describing: scrollPositionHashMap))
+        //NSLog("THIS IS FROM READIUM go(to direction: %@", String(describing: scrollPositionHashMap))
         guard on(.move(direction)) else {
             return false
         }
@@ -751,54 +751,71 @@ open class EPUBNavigatorViewController: UIViewController,
         when: { [weak self] in self?.state == .idle },
         pollingInterval: 0.1
     ) { [weak self] in
-        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation %@", String(describing: self?.currentLocation))
+        //NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->notifyCurrentLocation %@", String(describing: self?.currentLocation))
 
-        if let cachedPosition = self?.currentLocation?.locations.position,
-           let cachedLocation = self?.scrollPositionHashMap[cachedPosition],
-           cachedLocation != nil,
-           (!(self?.isCachedApplied ?? true)) {
+//        if let cachedPosition = self?.currentLocation?.locations.position,
+//           let cachedLocation = self?.scrollPositionHashMap[cachedPosition],
+//           cachedLocation != nil,
+//           (!(self?.isCachedApplied ?? true)) {
+//
+//            NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->SAVED IN CACHED   %@", String(describing: cachedLocation!))
+//
+//            guard
+//                let self = self,
+//                let delegate = self.delegate,
+//                let location = self.currentLocation
+//            else {
+//                return
+//            }
+//
+//            self.isCachedApplied = true
+//
+//            let index = location.locations.position ?? 1
+//            self.scrollPositionHashMap[index] = location
+//
+//            self.notifiedCurrentLocation = cachedLocation
+//            delegate.navigator(self, locationDidChange: cachedLocation!)
+//
+//            self.go(to: cachedLocation!)
+//        } else {
+//            guard
+//                let self = self,
+//                let delegate = self.delegate,
+//                let location = self.currentLocation,
+//                location != self.notifiedCurrentLocation
+//            else {
+//                return
+//            }
+//
+//            self.isCachedApplied = false
+//
+//            let index = location.locations.position ?? 1
+//            self.scrollPositionHashMap[index] = location
+//
+//            self.notifiedCurrentLocation = location
+//            delegate.navigator(self, locationDidChange: location)
+//        }
 
-            NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->SAVED IN CACHED   %@", String(describing: cachedLocation!))
-
-            guard
-                let self = self,
-                let delegate = self.delegate,
-                let location = self.currentLocation
-            else {
-                return
-            }
-
-            self.isCachedApplied = true
-
-            let index = location.locations.position ?? 1
-            self.scrollPositionHashMap[index] = location
-
-            self.notifiedCurrentLocation = cachedLocation
-            delegate.navigator(self, locationDidChange: cachedLocation!)
-
-            self.go(to: cachedLocation!)
-        } else {
-            guard
-                let self = self,
-                let delegate = self.delegate,
-                let location = self.currentLocation,
-                location != self.notifiedCurrentLocation
-            else {
-                return
-            }
-
-            self.isCachedApplied = false
-
-            let index = location.locations.position ?? 1
-            self.scrollPositionHashMap[index] = location
-
-            self.notifiedCurrentLocation = location
-            delegate.navigator(self, locationDidChange: location)
+        guard
+            let self = self,
+            let delegate = self.delegate,
+            let location = self.currentLocation,
+            location != self.notifiedCurrentLocation
+        else {
+            return
         }
+
+        self.isCachedApplied = false
+
+        let index = location.locations.position ?? 1
+        self.scrollPositionHashMap[index] = location
+
+        self.notifiedCurrentLocation = location
+        delegate.navigator(self, locationDidChange: location)
     }
 
     public func go(to locator: Locator, animated: Bool, completion: @escaping () -> Void) -> Bool {
-        NSLog("THIS IS FROM READIUM go(to locator: Locator: %@", String(describing: scrollPositionHashMap))
+        //NSLog("THIS IS FROM READIUM go(to locator: Locator: %@", String(describing: scrollPositionHashMap))
         scrollPositionHashMap[currentSpreadIndex] = nil
         guard
             let spreadIndex = spreads.firstIndex(withHref: locator.href),
@@ -819,7 +836,7 @@ open class EPUBNavigatorViewController: UIViewController,
             return false
         }
 
-        NSLog("THIS IS FROM READIUM go(to link Link: %@", String(describing: scrollPositionHashMap))
+        //NSLog("THIS IS FROM READIUM go(to link Link: %@", String(describing: scrollPositionHashMap))
         return go(to: locator, animated: animated, completion: completion)
     }
 
@@ -832,7 +849,7 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .left
             }
         }()
-        NSLog("THIS IS FROM READIUM goForward(animated Bool: %@", String(describing: scrollPositionHashMap))
+        //NSLog("THIS IS FROM READIUM goForward(animated Bool: %@", String(describing: scrollPositionHashMap))
         return go(to: direction, animated: animated, completion: completion)
     }
 
@@ -846,7 +863,7 @@ open class EPUBNavigatorViewController: UIViewController,
             }
         }()
 
-        NSLog("THIS IS FROM READIUM goBackward(animated Bool %@", String(describing: scrollPositionHashMap))
+        //NSLog("THIS IS FROM READIUM goBackward(animated Bool %@", String(describing: scrollPositionHashMap))
         return go(to: direction, animated: animated, completion: completion)
     }
 
@@ -1245,7 +1262,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
             animatedLoad: false
         )
         spreadView.delegate = self
-        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->pageViewAtIndex")
+        //NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->pageViewAtIndex")
 
         let userContentController = spreadView.webView.configuration.userContentController
         delegate?.navigator(self, setupUserScripts: userContentController)
@@ -1256,7 +1273,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     func paginationViewDidUpdateViews(_ paginationView: PaginationView) {
         // notice that you should set the delegate before you load views
         // otherwise, when open the publication, you may miss the first invocation
-        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->paginationViewDidUpdateViews")
+        //NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->paginationViewDidUpdateViews")
         notifyCurrentLocation()
 
         // FIXME: Deprecated, to be removed at some point.
@@ -1266,7 +1283,7 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     }
 
     func paginationView(_ paginationView: PaginationView, positionCountAtIndex index: Int) -> Int {
-        NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->positionCountAtIndex: %@", String(describing: index))
+        //NSLog("THIS IS FROM READIUM EPUBNavigatorViewController->positionCountAtIndex: %@", String(describing: index))
         return spreads[index].positionCount(in: readingOrder, positionsByReadingOrder: positionsByReadingOrder)
     }
 }

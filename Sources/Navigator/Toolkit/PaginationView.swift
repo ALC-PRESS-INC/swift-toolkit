@@ -160,7 +160,7 @@ final class PaginationView: UIView, Loggable {
     ///   - readingProgression: Direction of reading progression.
     ///   - completion: Closure called when the location is loaded.
     func reloadAtIndex(_ index: Int, location: PageLocation, pageCount: Int, readingProgression: ReadingProgression, completion: @escaping () -> Void) {
-        NSLog("THIS IS FROM READIUM PaginationView->reloadAtIndex")
+        //NSLog("THIS IS FROM READIUM PaginationView->reloadAtIndex")
         precondition(pageCount >= 1)
         precondition(0 ..< pageCount ~= index)
 
@@ -178,7 +178,7 @@ final class PaginationView: UIView, Loggable {
 
     /// Updates the current and pre-loaded views.
     private func setCurrentIndex(_ index: Int, location: PageLocation? = nil, completion: @escaping () -> Void = {}) {
-        NSLog("THIS IS FROM READIUM PaginationView->setCurrentIndex")
+        //NSLog("THIS IS FROM READIUM PaginationView->setCurrentIndex")
         guard isEmpty || index != currentIndex else {
             completion()
             return
@@ -195,8 +195,8 @@ final class PaginationView: UIView, Loggable {
         // To make sure that the views the most likely to be visible are loaded first, we first load
         // the current one, then the next ones and to finish the previous ones.
         scheduleLoadPage(at: index, location: location)
-        NSLog("THIS IS FROM READIUM PaginationView->setCurrentIndex->preloadNextPositionCount %@", String(describing: preloadNextPositionCount))
-        NSLog("THIS IS FROM READIUM PaginationView->setCurrentIndex->preloadPreviousPositionCount %@", String(describing: preloadPreviousPositionCount))
+        //NSLog("THIS IS FROM READIUM PaginationView->setCurrentIndex->preloadNextPositionCount %@", String(describing: preloadNextPositionCount))
+        //NSLog("THIS IS FROM READIUM PaginationView->setCurrentIndex->preloadPreviousPositionCount %@", String(describing: preloadPreviousPositionCount))
         let lastIndex = scheduleLoadPages(from: index, upToPositionCount: preloadNextPositionCount, direction: .forward, location: .start)
         let firstIndex = scheduleLoadPages(from: index, upToPositionCount: preloadPreviousPositionCount, direction: .backward, location: .end)
 
@@ -218,7 +218,7 @@ final class PaginationView: UIView, Loggable {
     }
 
     private func loadNextPage(completion: @escaping () -> Void) {
-        NSLog("THIS IS FROM READIUM PaginationView->loadNextPage")
+        //NSLog("THIS IS FROM READIUM PaginationView->loadNextPage")
         guard let (index, location) = loadingIndexQueue.popFirst() else {
             completion()
             return
@@ -251,7 +251,7 @@ final class PaginationView: UIView, Loggable {
     ///   - direction: The direction in which to load the views from the sourceIndex.
     /// - Returns: The last page index to be loaded after reaching the requested number of positions.
     private func scheduleLoadPages(from sourceIndex: Int, upToPositionCount positionCount: Int, direction: PageIndexDirection, location: PageLocation) -> Int {
-        NSLog("THIS IS FROM READIUM PaginationView->scheduleLoadPages")
+        //NSLog("THIS IS FROM READIUM PaginationView->scheduleLoadPages")
         let index = sourceIndex + direction.rawValue
         guard
             positionCount > 0,
@@ -274,7 +274,7 @@ final class PaginationView: UIView, Loggable {
     /// - Returns: Whether page is or will be loaded.
     @discardableResult
     private func scheduleLoadPage(at index: Int, location: PageLocation) -> Bool {
-        NSLog("THIS IS FROM READIUM PaginationView->scheduleLoadPage")
+        //NSLog("THIS IS FROM READIUM PaginationView->scheduleLoadPage")
         guard 0 ..< pageCount ~= index else {
             return false
         }
@@ -307,7 +307,7 @@ final class PaginationView: UIView, Loggable {
         } else {
             fadeToView(at: index, location: location, animated: animated, completion: completion)
         }
-        NSLog("THIS IS FROM READIUM PaginationView->goToIndex")
+        //NSLog("THIS IS FROM READIUM PaginationView->goToIndex")
         return true
     }
 
@@ -322,7 +322,7 @@ final class PaginationView: UIView, Loggable {
                 completion()
             }
         }
-        NSLog("THIS IS FROM READIUM PaginationView->fadeToView")
+        //NSLog("THIS IS FROM READIUM PaginationView->fadeToView")
 
         fade(to: 0) {
             self.scrollToView(at: index, location: location) {
@@ -340,7 +340,7 @@ final class PaginationView: UIView, Loggable {
             }
             return
         }
-        NSLog("THIS IS FROM READIUM PaginationView->scrollToView")
+        //NSLog("THIS IS FROM READIUM PaginationView->scrollToView")
 
         scrollView.isScrollEnabled = true
         setCurrentIndex(index, location: location, completion: completion)
@@ -377,7 +377,7 @@ extension PaginationView: UIScrollViewDelegate {
     }
 
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        NSLog("THIS IS FROM READIUM PaginationView->scrollViewDidEndDecelerating")
+        //NSLog("THIS IS FROM READIUM PaginationView->scrollViewDidEndDecelerating")
         scrollView.isScrollEnabled = true
 
         let currentOffset = (readingProgression == .rtl)
