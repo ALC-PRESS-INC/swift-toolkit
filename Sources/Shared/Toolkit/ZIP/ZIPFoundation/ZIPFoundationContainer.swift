@@ -21,7 +21,7 @@ final class ZIPFoundationContainer: Container, Loggable {
 
             var entries = [RelativeURL: Entry]()
 
-            for try await entry in archive {
+            for entry in try await archive.entries() {
                 guard
                     entry.type == .file,
                     let url = RelativeURL(path: entry.path)?.normalized,
@@ -60,7 +60,7 @@ final class ZIPFoundationContainer: Container, Loggable {
 
     subscript(url: any URLConvertible) -> (any Resource)? {
         guard
-            let url = url.relativeURL?.normalized,
+            let url = url.anyURL.relativeURL?.normalized,
             let entry = entriesByPath[url]
         else {
             return nil
