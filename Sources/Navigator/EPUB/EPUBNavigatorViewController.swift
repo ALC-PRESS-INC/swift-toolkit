@@ -1262,11 +1262,8 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
     func paginationViewDidScroll(_ paginationView: PaginationView, toIndex index: Int) {
         // Store current page location before moving forward
         if let location = currentLocation {
-            paginationView.pageIndexLocations[index] = location
-            log(.debug, "log stored location: \(location)")
-            print("print stored location: \(location)")
+            paginationView.pageIndexLocations[paginationView.currentIndex] = location
+            print("print stored location: \(location), at current index: \(paginationView.currentIndex), to index: \(index)")
         }
-        log(.debug, "log current location: \(currentLocation)")
-        print("print current location: \(currentLocation)")
     }
 }

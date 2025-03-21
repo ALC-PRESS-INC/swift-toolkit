@@ -249,9 +249,9 @@ final class PaginationView: UIView, Loggable {
     private func scheduleLoadPages(from sourceIndex: Int, upToPositionCount positionCount: Int, direction: PageIndexDirection, location: PageLocation) -> Int {
         let index = sourceIndex + direction.rawValue
         var location = location
+        print("page index locations: \(pageIndexLocations)")
         if let locator = pageIndexLocations[index] {
             location = .locator(locator)
-            log(.debug, "log retained location: \(location), at index \(index)")
             print("print retained location: \(location), at index \(index)")
         }
         guard
