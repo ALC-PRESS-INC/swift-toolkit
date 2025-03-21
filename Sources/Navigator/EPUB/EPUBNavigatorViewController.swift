@@ -236,6 +236,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
     private let readingOrder: [Link]
     public private(set) var currentLocation: Locator?
+    public var pageLocations: [String: Locator] = [:]
     private let loadPositionsByReadingOrder: () async -> ReadResult<[[Locator]]>
     private var positionsByReadingOrder: [[Locator]] = []
     private let tasks = CancellableTasks()
@@ -501,10 +502,22 @@ open class EPUBNavigatorViewController: UIViewController,
         let moved: Bool = await {
             switch direction {
             case .left:
-                let location: PageLocation = isRTL ? .start : .end
+                var location: PageLocation = isRTL ? .start : .end
+                let spread = spreads[currentSpreadIndex - delta]
+                log(.debug, "\(direction) spread links: \(spread.links)")
+                if let href = spread.links.first?.href, let locator = pageLocations[href] {
+                    location = .locator(locator)
+                    log(.debug, "retained href: \(href), location: \(location)")
+                }
                 return await paginationView.goToIndex(currentSpreadIndex - delta, location: location, options: options)
             case .right:
-                let location: PageLocation = isRTL ? .end : .start
+                var location: PageLocation = isRTL ? .end : .start
+                let spread = spreads[currentSpreadIndex + delta]
+                log(.debug, "\(direction) spread links: \(spread.links)")
+                if let href = spread.links.first?.href, let locator = pageLocations[href] {
+                    location = .locator(locator)
+                    log(.debug, "retained href: \(href), location: \(location)")
+                }
                 return await paginationView.goToIndex(currentSpreadIndex + delta, location: location, options: options)
             }
         }()
@@ -750,6 +763,10 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .left
             }
         }()
+        // Store current page location before moving forward
+        if let location = currentLocation {
+            pageLocations[location.href.string] = location
+        }
         return await go(to: direction, options: options)
     }
 
@@ -763,6 +780,10 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .right
             }
         }()
+        // Store current page location before moving backward
+        if let location = currentLocation {
+            pageLocations[location.href.string] = location
+        }
         return await go(to: direction, options: options)
     }
 
