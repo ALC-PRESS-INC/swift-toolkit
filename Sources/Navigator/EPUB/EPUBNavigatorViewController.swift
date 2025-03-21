@@ -236,7 +236,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
     private let readingOrder: [Link]
     public private(set) var currentLocation: Locator?
-    public var pageLocations: [String: Locator] = [:]
+//    public var pageLocations: [String: Locator] = [:]
     private let loadPositionsByReadingOrder: () async -> ReadResult<[[Locator]]>
     private var positionsByReadingOrder: [[Locator]] = []
     private let tasks = CancellableTasks()
@@ -502,22 +502,22 @@ open class EPUBNavigatorViewController: UIViewController,
         let moved: Bool = await {
             switch direction {
             case .left:
-                var location: PageLocation = isRTL ? .start : .end
-                let spread = spreads[currentSpreadIndex - delta]
-                log(.debug, "\(direction) spread links: \(spread.links)")
-                if let href = spread.links.first?.href, let locator = pageLocations[href] {
-                    location = .locator(locator)
-                    log(.debug, "retained href: \(href), location: \(location)")
-                }
+                let location: PageLocation = isRTL ? .start : .end
+//                let spread = spreads[currentSpreadIndex - delta]
+//                print("\(direction) spread links: \(spread.links)")
+//                if let href = spread.links.first?.href, let locator = pageLocations[href] {
+//                    location = .locator(locator)
+//                    print("retained href: \(href), location: \(location)")
+//                }
                 return await paginationView.goToIndex(currentSpreadIndex - delta, location: location, options: options)
             case .right:
-                var location: PageLocation = isRTL ? .end : .start
-                let spread = spreads[currentSpreadIndex + delta]
-                log(.debug, "\(direction) spread links: \(spread.links)")
-                if let href = spread.links.first?.href, let locator = pageLocations[href] {
-                    location = .locator(locator)
-                    log(.debug, "retained href: \(href), location: \(location)")
-                }
+                let location: PageLocation = isRTL ? .end : .start
+//                let spread = spreads[currentSpreadIndex + delta]
+//                print("\(direction) spread links: \(spread.links)")
+//                if let href = spread.links.first?.href, let locator = pageLocations[href] {
+//                    location = .locator(locator)
+//                    print("retained href: \(href), location: \(location)")
+//                }
                 return await paginationView.goToIndex(currentSpreadIndex + delta, location: location, options: options)
             }
         }()
@@ -763,10 +763,6 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .left
             }
         }()
-        // Store current page location before moving forward
-        if let location = currentLocation {
-            pageLocations[location.href.string] = location
-        }
         return await go(to: direction, options: options)
     }
 
@@ -780,10 +776,6 @@ open class EPUBNavigatorViewController: UIViewController,
                 return .right
             }
         }()
-        // Store current page location before moving backward
-        if let location = currentLocation {
-            pageLocations[location.href.string] = location
-        }
         return await go(to: direction, options: options)
     }
 
@@ -1265,5 +1257,16 @@ extension EPUBNavigatorViewController: PaginationViewDelegate {
 
     func paginationView(_ paginationView: PaginationView, positionCountAtIndex index: Int) -> Int {
         spreads[index].positionCount(in: readingOrder, positionsByReadingOrder: positionsByReadingOrder)
+    }
+
+    func paginationViewDidScroll(_ paginationView: PaginationView, toIndex index: Int) {
+        // Store current page location before moving forward
+        if let location = currentLocation {
+            paginationView.pageIndexLocations[index] = location
+            log(.debug, "log stored location: \(location)")
+            print("print stored location: \(location)")
+        }
+        log(.debug, "log current location: \(currentLocation)")
+        print("print current location: \(currentLocation)")
     }
 }

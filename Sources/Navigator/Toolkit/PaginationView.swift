@@ -43,6 +43,8 @@ protocol PaginationViewDelegate: AnyObject {
 
     /// Returns the number of positions (as in `Publication.positionList`) in the page view at given index.
     func paginationView(_ paginationView: PaginationView, positionCountAtIndex index: Int) -> Int
+
+    func paginationViewDidScroll(_ paginationView: PaginationView, toIndex index: Int)
 }
 
 final class PaginationView: UIView, Loggable {
@@ -59,6 +61,8 @@ final class PaginationView: UIView, Loggable {
 
     /// Pre-loaded page views, indexed by their position.
     private(set) var loadedViews: [Int: UIView & PageView] = [:]
+
+    public var pageIndexLocations: [Int: Locator] = [:]
 
     /// Number of positions (as in `Publication.positionList`) to preload before and after the
     /// current page.
@@ -244,6 +248,12 @@ final class PaginationView: UIView, Loggable {
     /// - Returns: The last page index to be loaded after reaching the requested number of positions.
     private func scheduleLoadPages(from sourceIndex: Int, upToPositionCount positionCount: Int, direction: PageIndexDirection, location: PageLocation) -> Int {
         let index = sourceIndex + direction.rawValue
+        var location = location
+        if let locator = pageIndexLocations[index] {
+            location = .locator(locator)
+            log(.debug, "log retained location: \(location), at index \(index)")
+            print("print retained location: \(location), at index \(index)")
+        }
         guard
             positionCount > 0,
             scheduleLoadPage(at: index, location: location),
@@ -372,6 +382,7 @@ extension PaginationView: UIScrollViewDelegate {
         let newIndex = Int(round(currentOffset / scrollView.frame.width))
 
         Task {
+            delegate?.paginationViewDidScroll(self, toIndex: newIndex)
             await setCurrentIndex(newIndex)
         }
     }
