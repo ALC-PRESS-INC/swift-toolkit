@@ -316,7 +316,7 @@ class EPUBMetadataParserTests: XCTestCase {
         XCTAssertEqual(
             sut.accessibility,
             Accessibility(
-                conformsTo: [.epubA11y10WCAG20A],
+                conformsTo: [.epubA11y10WCAG20A, .epubA11y11WCAG20AAA, .epubA11y11WCAG21AA],
                 certification: Accessibility.Certification(
                     certifiedBy: "Accessibility Testers Group",
                     credential: "DAISY OK",
@@ -326,9 +326,11 @@ class EPUBMetadataParserTests: XCTestCase {
                 accessModes: [.textual, .visual],
                 accessModesSufficient: [[.textual], [.textual, .visual]],
                 features: [.structuralNavigation, .alternativeText],
-                hazards: [.motionSimulation, .noSoundHazard]
+                hazards: [.motionSimulation, .noSoundHazard],
+                exemptions: [.eaaMicroenterprise, .eaaFundamentalAlteration, .eaaDisproportionateBurden]
             )
         )
+        // Checks that the a11y metadata are not added to otherMetadata.
         XCTAssertEqual(Array(sut.otherMetadata.keys), ["presentation"])
     }
 
@@ -337,7 +339,7 @@ class EPUBMetadataParserTests: XCTestCase {
         XCTAssertEqual(
             sut.accessibility,
             Accessibility(
-                conformsTo: [.epubA11y10WCAG20A],
+                conformsTo: [.epubA11y10WCAG20A, .epubA11y11WCAG20AAA, .epubA11y11WCAG21AA],
                 certification: Accessibility.Certification(
                     certifiedBy: "Accessibility Testers Group",
                     credential: "DAISY OK",
@@ -347,10 +349,34 @@ class EPUBMetadataParserTests: XCTestCase {
                 accessModes: [.textual, .visual],
                 accessModesSufficient: [[.textual], [.textual, .visual]],
                 features: [.structuralNavigation, .alternativeText],
-                hazards: [.motionSimulation, .noSoundHazard]
+                hazards: [.motionSimulation, .noSoundHazard],
+                exemptions: [.eaaMicroenterprise, .eaaFundamentalAlteration, .eaaDisproportionateBurden]
             )
         )
+        // Checks that the a11y metadata are not added to otherMetadata.
         XCTAssertEqual(Array(sut.otherMetadata.keys), ["presentation"])
+    }
+
+    func testParseEPUB2TDM() throws {
+        let sut = try parseMetadata("tdm-epub2")
+        XCTAssertEqual(
+            sut.tdm,
+            TDM(
+                reservation: .all,
+                policy: HTTPURL(string: "https://provider.com/policies/policy.json")!
+            )
+        )
+    }
+
+    func testParseEPUB3TDM() throws {
+        let sut = try parseMetadata("tdm-epub3")
+        XCTAssertEqual(
+            sut.tdm,
+            TDM(
+                reservation: .all,
+                policy: HTTPURL(string: "https://provider.com/policies/policy.json")!
+            )
+        )
     }
 
     // MARK: - Toolkit

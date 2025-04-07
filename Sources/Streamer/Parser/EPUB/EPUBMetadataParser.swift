@@ -61,6 +61,7 @@ final class EPUBMetadataParser: Loggable {
             numberOfPages: numberOfPages,
             belongsToCollections: belongsToCollections,
             belongsToSeries: belongsToSeries,
+            tdm: tdm(),
             otherMetadata: otherMetadata
         )
     }
@@ -189,7 +190,8 @@ final class EPUBMetadataParser: Loggable {
             accessModes: accessibilityAccessModes(),
             accessModesSufficient: accessibilityAccessModesSufficient(),
             features: accessibilityFeatures(),
-            hazards: accessibilityHazards()
+            hazards: accessibilityHazards(),
+            exemptions: accessibilityExemptions()
         )
 
         return accessibility.takeIf { $0 != Accessibility() }
@@ -203,26 +205,51 @@ final class EPUBMetadataParser: Loggable {
 
     private func accessibilityProfile(from value: String) -> Accessibility.Profile? {
         switch value {
-        case "EPUB Accessibility 1.1 - WCAG 2.0 Level A",
-             "http://idpf.org/epub/a11y/accessibility-20170105.html#wcag-a",
+        case "http://idpf.org/epub/a11y/accessibility-20170105.html#wcag-a",
              "http://www.idpf.org/epub/a11y/accessibility-20170105.html#wcag-a",
              "https://idpf.org/epub/a11y/accessibility-20170105.html#wcag-a",
              "https://www.idpf.org/epub/a11y/accessibility-20170105.html#wcag-a":
             return .epubA11y10WCAG20A
 
-        case "EPUB Accessibility 1.1 - WCAG 2.0 Level AA",
-             "http://idpf.org/epub/a11y/accessibility-20170105.html#wcag-aa",
+        case "http://idpf.org/epub/a11y/accessibility-20170105.html#wcag-aa",
              "http://www.idpf.org/epub/a11y/accessibility-20170105.html#wcag-aa",
              "https://idpf.org/epub/a11y/accessibility-20170105.html#wcag-aa",
              "https://www.idpf.org/epub/a11y/accessibility-20170105.html#wcag-aa":
             return .epubA11y10WCAG20AA
 
-        case "EPUB Accessibility 1.1 - WCAG 2.0 Level AAA",
-             "http://idpf.org/epub/a11y/accessibility-20170105.html#wcag-aaa",
+        case "http://idpf.org/epub/a11y/accessibility-20170105.html#wcag-aaa",
              "http://www.idpf.org/epub/a11y/accessibility-20170105.html#wcag-aaa",
              "https://idpf.org/epub/a11y/accessibility-20170105.html#wcag-aaa",
              "https://www.idpf.org/epub/a11y/accessibility-20170105.html#wcag-aaa":
             return .epubA11y10WCAG20AAA
+
+        case "EPUB Accessibility 1.1 - WCAG 2.0 Level A":
+            return .epubA11y11WCAG20A
+
+        case "EPUB Accessibility 1.1 - WCAG 2.0 Level AA":
+            return .epubA11y11WCAG20AA
+
+        case "EPUB Accessibility 1.1 - WCAG 2.0 Level AAA":
+            return .epubA11y11WCAG20AAA
+
+        case "EPUB Accessibility 1.1 - WCAG 2.1 Level A":
+            return .epubA11y11WCAG21A
+
+        case "EPUB Accessibility 1.1 - WCAG 2.1 Level AA":
+            return .epubA11y11WCAG21AA
+
+        case "EPUB Accessibility 1.1 - WCAG 2.1 Level AAA":
+            return .epubA11y11WCAG21AAA
+
+        case "EPUB Accessibility 1.1 - WCAG 2.2 Level A":
+            return .epubA11y11WCAG22A
+
+        case "EPUB Accessibility 1.1 - WCAG 2.2 Level AA":
+            return .epubA11y11WCAG22AA
+
+        case "EPUB Accessibility 1.1 - WCAG 2.2 Level AAA":
+            return .epubA11y11WCAG22AAA
+
         default:
             return nil
         }
@@ -274,6 +301,27 @@ final class EPUBMetadataParser: Loggable {
     private func accessibilityHazards() -> [Accessibility.Hazard] {
         metas["accessibilityHazard", in: .schema]
             .map { Accessibility.Hazard($0.content) }
+    }
+
+    private func accessibilityExemptions() -> [Accessibility.Exemption] {
+        metas["exemption", in: .a11y]
+            .map { Accessibility.Exemption($0.content) }
+    }
+
+    /// https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240510/#sec-epub3
+    private func tdm() -> TDM? {
+        guard
+            let reservationMeta = metas["reservation", in: .tdm].first,
+            let reservation = TDM.Reservation(epub: reservationMeta)
+        else {
+            return nil
+        }
+
+        return TDM(
+            reservation: reservation,
+            policy: metas["policy", in: .tdm].first
+                .flatMap { HTTPURL(string: $0.content) }
+        )
     }
 
     /// Parse and return the Epub unique identifier.
@@ -571,5 +619,18 @@ final class EPUBMetadataParser: Loggable {
     private func dcElement(tag: String) -> ReadiumFuzi.XMLElement? {
         metadataElement?
             .firstChild(xpath: "(.|opf:dc-metadata)/dc:\(tag)")
+    }
+}
+
+private extension TDM.Reservation {
+    init?(epub: OPFMeta) {
+        switch epub.content {
+        case "0":
+            self = .none
+        case "1":
+            self = .all
+        default:
+            return nil
+        }
     }
 }
