@@ -194,8 +194,7 @@ final class PaginationView: UIView, Loggable {
         // resource depending on the last index. This allows to navigate backward across resources,
         // starting from the end of each previous resource.
         let movingBackward = (currentIndex - 1 == index)
-//        var location = location ?? (movingBackward ? .end : .start)
-        var location = location ?? .start
+        var location = location ?? (movingBackward ? .end : .start)
         if let locator = pageIndexLocations[index] {
             location = .locator(locator)
             print("retained current location: \(location), at index \(index)")
@@ -207,7 +206,7 @@ final class PaginationView: UIView, Loggable {
         // the current one, then the next ones and to finish the previous ones.
         scheduleLoadPage(at: index, location: location)
         let lastIndex = scheduleLoadPages(from: index, upToPositionCount: preloadNextPositionCount, direction: .forward, location: .start)
-        let firstIndex = scheduleLoadPages(from: index, upToPositionCount: preloadPreviousPositionCount, direction: .backward, location: .end)
+        let firstIndex = scheduleLoadPages(from: index, upToPositionCount: preloadPreviousPositionCount, direction: .backward, location: .start)
 
         for (i, view) in loadedViews {
             // Flushes the views that are not needed anymore.
