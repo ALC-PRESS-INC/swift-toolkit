@@ -150,7 +150,7 @@ public actor EPUBPositionsService: PositionsService {
             let progression = 1.0 / Double(positionCount) * Double(position)
 
             if skippedPages.contains(locatorPosition) { return nil }
-            print("Make position \(position) + startIndex: \(startIndexPosition) = \(locatorPosition), positionRange: \(positionRange), progression: \(progression), count: \(positionCount), href: \(href))")
+
             return Locator(
                 href: AnyURL(string: href)!,
                 mediaType: link.mediaType ?? .html,
