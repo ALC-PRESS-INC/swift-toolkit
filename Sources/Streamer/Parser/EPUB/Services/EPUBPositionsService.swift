@@ -147,17 +147,16 @@ public actor EPUBPositionsService: PositionsService {
 
         let positions = (0..<positionCount).compactMap { position -> Locator? in
             let locatorPosition = startIndexPosition + position
+            let progression = 1.0 / Double(positionCount) * Double(position)
 
-            if skippedPages.contains(locatorPosition) {
-                return nil
-            }
-            print("Make position \(position) + startIndex: \(startIndexPosition) = \(locatorPosition), positionRange: \(positionRange), progression: \(Double(position - 1) / Double(positionCount)), count: \(positionCount), href: \(href), title: \(link.title ?? "")")
+            if skippedPages.contains(locatorPosition) { return nil }
+            print("Make position \(position) + startIndex: \(startIndexPosition) = \(locatorPosition), positionRange: \(positionRange), progression: \(progression), count: \(positionCount), href: \(href))")
             return Locator(
                 href: AnyURL(string: href)!,
                 mediaType: link.mediaType ?? .html,
                 title: link.title,
                 locations: .init(
-                    progression: Double(position - 1) / Double(positionCount),
+                    progression: progression,
                     position: locatorPosition
                 )
             )
