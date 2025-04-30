@@ -135,8 +135,8 @@ public actor EPUBPositionsService: PositionsService {
         let href = link.href
         var startIndexPosition = startPosition
         let positionRange = pageList
-            .filter { $0.href.hasPrefix(href)}
-            .compactMap { Int($0.title ?? "")}
+            .filter { $0.href.hasPrefix(href) }
+            .compactMap { Int($0.title ?? "") }
         let positionCount = pageList.filter { $0.href.hasPrefix(href) }.count
 
         if !positionRange.isEmpty {
@@ -151,7 +151,7 @@ public actor EPUBPositionsService: PositionsService {
             if skippedPages.contains(locatorPosition) {
                 return nil
             }
-
+            print("Make position \(position) + startIndex: \(startIndexPosition) = \(locatorPosition), positionRange: \(positionRange), progression: \(Double(position - 1) / Double(positionCount)), count: \(positionCount), href: \(href), title: \(link.title ?? "")")
             return Locator(
                 href: AnyURL(string: href)!,
                 mediaType: link.mediaType ?? .html,
