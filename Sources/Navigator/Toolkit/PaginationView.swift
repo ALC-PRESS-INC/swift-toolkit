@@ -182,6 +182,8 @@ final class PaginationView: UIView, Loggable {
         loadingIndexQueue.removeAll()
 
         await setCurrentIndex(index, location: location)
+        await preloadPagesFromIndex(index)
+        await loadNextPages()
     }
 
     /// Updates the current and pre-loaded views.
@@ -193,7 +195,7 @@ final class PaginationView: UIView, Loggable {
         // If no explicit location is given, we'll load either the beginning or the end of the
         // resource depending on the last index. This allows to navigate backward across resources,
         // starting from the end of each previous resource.
-        let movingBackward = (currentIndex - 1 == index)
+//        let movingBackward = (currentIndex - 1 == index)
 //        var location = location ?? (movingBackward ? .end : .start)
         var location = location ?? .start
         if let locator = pageIndexLocations[index] {
@@ -206,6 +208,41 @@ final class PaginationView: UIView, Loggable {
         // To make sure that the views the most likely to be visible are loaded first, we first load
         // the current one, then the next ones and to finish the previous ones.
         scheduleLoadPage(at: index, location: location)
+
+        await loadCurrentPage()
+        delegate?.paginationViewDidUpdateViews(self)
+    }
+
+    private func loadCurrentPage() async {
+        guard let (index, location) = loadingIndexQueue.first(where: { $0.index == currentIndex })
+        else { return }
+        await loadPageAtIndex(index, location: location)
+    }
+
+    private func loadNextPages() async {
+        await withTaskGroup { group in
+            loadingIndexQueue.forEach { (index, location) in
+                group.addTask { await self.loadPageAtIndex(index, location: location)}
+            }
+        }
+    }
+
+    private func loadPageAtIndex(_ index: Int, location: PageLocation) async {
+        // Remove from queue
+        loadingIndexQueue.removeAll(where: { $0.index == index })
+
+        if loadedViews[index] == nil,
+           let view = delegate?.paginationView(self, pageViewAtIndex: index)
+        {
+            loadedViews[index] = view
+            scrollView.addSubview(view)
+            setNeedsLayout()
+        }
+        guard let view = loadedViews[index] else { return }
+        await view.go(to: location)
+    }
+
+    private func preloadPagesFromIndex(_ index: Int) async {
         let lastIndex = scheduleLoadPages(from: index, upToPositionCount: preloadNextPositionCount, direction: .forward, location: .start)
         let firstIndex = scheduleLoadPages(from: index, upToPositionCount: preloadPreviousPositionCount, direction: .backward, location: .start)
 
@@ -217,31 +254,6 @@ final class PaginationView: UIView, Loggable {
                 continue
             }
         }
-
-        await loadNextPage()
-        delegate?.paginationViewDidUpdateViews(self)
-    }
-
-    private func loadNextPage() async {
-        guard let (index, location) = loadingIndexQueue.popFirst() else {
-            return
-        }
-
-        if
-            loadedViews[index] == nil,
-            let view = delegate?.paginationView(self, pageViewAtIndex: index)
-        {
-            loadedViews[index] = view
-            scrollView.addSubview(view)
-            setNeedsLayout()
-        }
-
-        guard let view = loadedViews[index] else {
-            return
-        }
-
-        await view.go(to: location)
-        await loadNextPage()
     }
 
     /// Queue views to be loaded until reaching the given number of pre-loaded positions.
@@ -311,6 +323,8 @@ final class PaginationView: UIView, Loggable {
         } else {
             await fadeToView(at: index, location: location, animated: options.animated)
         }
+        await preloadPagesFromIndex(index)
+        await loadNextPages()
         return true
     }
 
@@ -388,6 +402,8 @@ extension PaginationView: UIScrollViewDelegate {
         Task {
             delegate?.paginationViewDidScroll(self, toIndex: newIndex)
             await setCurrentIndex(newIndex)
+            await preloadPagesFromIndex(newIndex)
+            await loadNextPages()
         }
     }
 }
