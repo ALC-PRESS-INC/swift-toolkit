@@ -683,9 +683,9 @@ open class EPUBNavigatorViewController: UIViewController,
             positionList.count > 0
         {
             // Gets the current locator from the positionList, and fill its missing data.
-//            var positionIndex = Int(floor(progression * Double(positionList.count - 1)))
-            var positionIndex = 0
-            if let index = positionList.firstIndex(where: {
+            var positionIndex = Int(floor(progression * Double(positionList.count - 1)))
+            // FIX computation of positionIndex
+            if let index = positionList.lastIndex(where: {
                 guard let locProgression = $0.locations.progression else { return false }
                 return progression >= locProgression
             }) { positionIndex = index }
