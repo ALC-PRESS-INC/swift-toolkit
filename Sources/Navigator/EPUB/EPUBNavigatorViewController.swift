@@ -687,7 +687,7 @@ open class EPUBNavigatorViewController: UIViewController,
             var positionIndex = 0
             if let index = positionList.firstIndex(where: {
                 guard let locProgression = $0.locations.progression else { return false }
-                return locProgression >= progression
+                return progression >= locProgression
             }) { positionIndex = index }
 
             return await positionList[positionIndex].copy(
