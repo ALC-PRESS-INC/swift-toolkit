@@ -220,7 +220,7 @@ final class PaginationView: UIView, Loggable {
     }
 
     private func loadNextPages() async {
-        await withTaskGroup { group in
+        await withTaskGroup(of: Void.self) { group in
             loadingIndexQueue.forEach { (index, location) in
                 group.addTask { await self.loadPageAtIndex(index, location: location)}
             }
