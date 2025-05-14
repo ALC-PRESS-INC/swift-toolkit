@@ -237,7 +237,6 @@ open class EPUBNavigatorViewController: UIViewController,
     private let readingOrder: [Link]
     public private(set) var currentLocation: Locator?
 //    public var pageLocations: [String: Locator] = [:]
-    private var goToHighlightLocation: Locator?
     private let loadPositionsByReadingOrder: () async -> ReadResult<[[Locator]]>
     private var positionsByReadingOrder: [[Locator]] = []
     private let tasks = CancellableTasks()
@@ -722,12 +721,7 @@ open class EPUBNavigatorViewController: UIViewController,
             return
         }
 
-        if let location = goToHighlightLocation {
-            currentLocation = location
-            goToHighlightLocation = nil
-        } else {
-            currentLocation = await computeCurrentLocation()
-        }
+        currentLocation = await computeCurrentLocation()
 
         if
             let delegate = delegate,
@@ -763,11 +757,6 @@ open class EPUBNavigatorViewController: UIViewController,
             return false
         }
         return await go(to: locator, options: options)
-    }
-
-    public func goToHighlight(location: Locator, options: NavigatorGoOptions) async -> Bool {
-        goToHighlightLocation = location
-        return await go(to: location, options: options)
     }
 
     @discardableResult
