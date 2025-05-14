@@ -673,11 +673,7 @@ open class EPUBNavigatorViewController: UIViewController,
 
         let link = spreadView.focusedResource ?? spreadView.spread.leading
         let href = link.url()
-        var progression = min(max(spreadView.progression(in: href), 0.0), 1.0)
-        if let location = goToHighlightLocation {
-            progression = location.locations.progression ?? progression
-            goToHighlightLocation = nil
-        }
+        let progression = min(max(spreadView.progression(in: href), 0.0), 1.0)
 
         if
             // The positions are not always available, for example a Readium
@@ -726,7 +722,12 @@ open class EPUBNavigatorViewController: UIViewController,
             return
         }
 
-        currentLocation = await computeCurrentLocation()
+        if let location = goToHighlightLocation {
+            currentLocation = location
+            goToHighlightLocation = nil
+        } else {
+            currentLocation = await computeCurrentLocation()
+        }
 
         if
             let delegate = delegate,
