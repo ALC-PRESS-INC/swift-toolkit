@@ -673,7 +673,9 @@ open class EPUBNavigatorViewController: UIViewController,
 
         let link = spreadView.focusedResource ?? spreadView.spread.leading
         let href = link.url()
-        let progression = min(max(spreadView.progression(in: href), 0.0), 1.0)
+        var progression = min(max(spreadView.progression(in: href), 0.0), 1.0)
+        // Round-up progression to 2 decimal places
+        progression = round(progression * 100.0) / 100.0
 
         if
             // The positions are not always available, for example a Readium
